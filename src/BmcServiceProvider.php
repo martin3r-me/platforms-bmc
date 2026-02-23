@@ -43,7 +43,7 @@ class BmcServiceProvider extends ServiceProvider
         // Step 3: Routes (if module registered)
         if (PlatformCore::getModule('bmc')) {
             ModuleRouter::group('bmc', function () {
-                // Phase 1: No web routes yet (LLM-first)
+                $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
             });
         }
 

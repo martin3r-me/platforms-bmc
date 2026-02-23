@@ -32,6 +32,11 @@ return [
                     'route' => 'bmc.dashboard',
                     'icon' => 'heroicon-o-home',
                 ],
+                'canvases' => [
+                    'title' => 'Canvases',
+                    'route' => 'bmc.canvases.index',
+                    'icon' => 'heroicon-o-squares-2x2',
+                ],
             ],
         ],
     ],
