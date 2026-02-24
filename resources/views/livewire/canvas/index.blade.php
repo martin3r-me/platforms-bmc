@@ -47,43 +47,40 @@
             {{-- Canvas Table --}}
             @if($canvases->isNotEmpty())
             <x-ui-panel title="Canvases" subtitle="{{ $stats['total'] }} Canvas(es) in diesem Team">
-                <x-ui-table>
-                    <x-slot name="head">
-                        <x-ui-table.heading>Name</x-ui-table.heading>
-                        <x-ui-table.heading>Status</x-ui-table.heading>
-                        <x-ui-table.heading>Bloecke</x-ui-table.heading>
-                        <x-ui-table.heading>Erstellt von</x-ui-table.heading>
-                        <x-ui-table.heading>Aktualisiert</x-ui-table.heading>
-                    </x-slot>
-                    <x-slot name="body">
+                <x-ui-table compact="true">
+                    <x-ui-table-header>
+                        <x-ui-table-header-cell compact="true">Name</x-ui-table-header-cell>
+                        <x-ui-table-header-cell compact="true">Status</x-ui-table-header-cell>
+                        <x-ui-table-header-cell compact="true">Bloecke</x-ui-table-header-cell>
+                        <x-ui-table-header-cell compact="true">Erstellt von</x-ui-table-header-cell>
+                        <x-ui-table-header-cell compact="true">Aktualisiert</x-ui-table-header-cell>
+                    </x-ui-table-header>
+                    <x-ui-table-body>
                         @foreach($canvases as $canvas)
-                        <x-ui-table.row
-                            href="{{ route('bmc.canvases.show', $canvas) }}"
-                            wireNavigate
-                        >
-                            <x-ui-table.cell>
+                        <x-ui-table-row compact="true" clickable="true" :href="route('bmc.canvases.show', $canvas)" wire:navigate>
+                            <x-ui-table-cell compact="true">
                                 <div class="font-medium text-[var(--ui-secondary)]">{{ $canvas->name }}</div>
                                 @if($canvas->description)
                                 <div class="text-xs text-[var(--ui-muted)] truncate max-w-xs mt-0.5">{{ Str::limit($canvas->description, 60) }}</div>
                                 @endif
-                            </x-ui-table.cell>
-                            <x-ui-table.cell>
+                            </x-ui-table-cell>
+                            <x-ui-table-cell compact="true">
                                 <x-ui-badge :variant="match($canvas->status) { 'active' => 'success', 'archived' => 'secondary', default => 'warning' }">
                                     {{ ucfirst($canvas->status) }}
                                 </x-ui-badge>
-                            </x-ui-table.cell>
-                            <x-ui-table.cell>
+                            </x-ui-table-cell>
+                            <x-ui-table-cell compact="true">
                                 <span class="text-sm">{{ $canvas->building_blocks_count }}/9</span>
-                            </x-ui-table.cell>
-                            <x-ui-table.cell>
+                            </x-ui-table-cell>
+                            <x-ui-table-cell compact="true">
                                 <span class="text-sm text-[var(--ui-muted)]">{{ $canvas->createdByUser?->name ?? '-' }}</span>
-                            </x-ui-table.cell>
-                            <x-ui-table.cell>
+                            </x-ui-table-cell>
+                            <x-ui-table-cell compact="true">
                                 <span class="text-sm text-[var(--ui-muted)]">{{ $canvas->updated_at?->diffForHumans() }}</span>
-                            </x-ui-table.cell>
-                        </x-ui-table.row>
+                            </x-ui-table-cell>
+                        </x-ui-table-row>
                         @endforeach
-                    </x-slot>
+                    </x-ui-table-body>
                 </x-ui-table>
 
                 <div class="p-4">
