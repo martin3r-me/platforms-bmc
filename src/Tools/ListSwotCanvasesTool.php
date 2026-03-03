@@ -10,19 +10,19 @@ use Platform\Core\Tools\Concerns\HasStandardGetOperations;
 use Platform\Bmc\Models\BmcCanvas;
 use Platform\Bmc\Tools\Concerns\ResolvesBmcTeam;
 
-class ListCanvasesTool implements ToolContract, ToolMetadataContract
+class ListSwotCanvasesTool implements ToolContract, ToolMetadataContract
 {
     use HasStandardGetOperations;
     use ResolvesBmcTeam;
 
     public function getName(): string
     {
-        return 'bmc.canvases.GET';
+        return 'bmc.swot.GET';
     }
 
     public function getDescription(): string
     {
-        return 'GET /bmc/canvases - Listet BMC Canvases. Parameter: team_id (optional), status (optional), filters/search/sort/limit/offset (optional).';
+        return 'GET /bmc/swot - Listet SWOT-Analysen. Pre-filtered auf canvas_type=swot. Parameter: team_id, status, filters/search/sort/limit/offset (alle optional).';
     }
 
     public function getSchema(): array
@@ -38,12 +38,7 @@ class ListCanvasesTool implements ToolContract, ToolMetadataContract
                     'status' => [
                         'type' => 'string',
                         'enum' => ['draft', 'active', 'archived'],
-                        'description' => 'Optional: Filter nach Status (draft, active, archived).',
-                    ],
-                    'canvas_type' => [
-                        'type' => 'string',
-                        'enum' => ['bmc', 'swot'],
-                        'description' => 'Optional: Filter nach Canvas-Typ (bmc oder swot). Ohne Filter werden alle Typen angezeigt.',
+                        'description' => 'Optional: Filter nach Status.',
                     ],
                 ],
             ]
@@ -61,14 +56,11 @@ class ListCanvasesTool implements ToolContract, ToolMetadataContract
 
             $query = BmcCanvas::query()
                 ->withCount('buildingBlocks', 'snapshots')
-                ->forTeam($teamId);
+                ->forTeam($teamId)
+                ->byCanvasType('swot');
 
             if (isset($arguments['status'])) {
                 $query->byStatus($arguments['status']);
-            }
-
-            if (isset($arguments['canvas_type'])) {
-                $query->byCanvasType($arguments['canvas_type']);
             }
 
             $this->applyStandardFilters($query, $arguments, [
@@ -94,9 +86,10 @@ class ListCanvasesTool implements ToolContract, ToolMetadataContract
                     'name' => $canvas->name,
                     'description' => $canvas->description,
                     'status' => $canvas->status,
-                    'canvas_type' => $canvas->canvas_type ?? 'bmc',
+                    'canvas_type' => 'swot',
                     'building_blocks_count' => $canvas->building_blocks_count,
                     'snapshots_count' => $canvas->snapshots_count,
+                    'linked_bmc_canvas_id' => $canvas->contextable_type === BmcCanvas::class ? $canvas->contextable_id : null,
                     'team_id' => $canvas->team_id,
                     'created_at' => $canvas->created_at?->toISOString(),
                     'updated_at' => $canvas->updated_at?->toISOString(),
@@ -109,7 +102,7 @@ class ListCanvasesTool implements ToolContract, ToolMetadataContract
                 'team_id' => $teamId,
             ]);
         } catch (\Throwable $e) {
-            return ToolResult::error('EXECUTION_ERROR', 'Fehler beim Laden der Canvases: ' . $e->getMessage());
+            return ToolResult::error('EXECUTION_ERROR', 'Fehler beim Laden der SWOT-Analysen: ' . $e->getMessage());
         }
     }
 
@@ -118,7 +111,7 @@ class ListCanvasesTool implements ToolContract, ToolMetadataContract
         return [
             'read_only' => true,
             'category' => 'read',
-            'tags' => ['bmc', 'canvases', 'list'],
+            'tags' => ['bmc', 'swot', 'list'],
             'risk_level' => 'safe',
             'requires_auth' => true,
             'requires_team' => true,

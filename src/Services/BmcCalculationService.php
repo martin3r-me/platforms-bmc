@@ -13,7 +13,7 @@ class BmcCalculationService
     {
         $canvas->loadMissing(['buildingBlocks.entries']);
 
-        $blockTypes = config('bmc-templates.block_types', []);
+        $blockTypes = $canvas->getBlockTypesConfig();
         $totalBlocks = count($blockTypes);
         $filledBlocks = 0;
         $totalEntries = 0;

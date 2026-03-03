@@ -22,6 +22,7 @@ class BmcCanvas extends Model
         'name',
         'description',
         'status',
+        'canvas_type',
         'contextable_type',
         'contextable_id',
         'created_by_user_id',
@@ -82,12 +83,36 @@ class BmcCanvas extends Model
         return $query->where('status', $status);
     }
 
+    public function scopeByCanvasType($query, string $canvasType)
+    {
+        return $query->where('canvas_type', $canvasType);
+    }
+
     /**
-     * Initialize the 9 Osterwalder building blocks from config.
+     * Get the config key for block types based on canvas_type.
+     */
+    public function getBlockTypesConfigKey(): string
+    {
+        return match ($this->canvas_type) {
+            'swot' => 'bmc-templates.swot_block_types',
+            default => 'bmc-templates.block_types',
+        };
+    }
+
+    /**
+     * Get the block types config for this canvas.
+     */
+    public function getBlockTypesConfig(): array
+    {
+        return config($this->getBlockTypesConfigKey(), []);
+    }
+
+    /**
+     * Initialize building blocks from config based on canvas_type.
      */
     public function initializeBlocks(): void
     {
-        $blockTypes = config('bmc-templates.block_types', []);
+        $blockTypes = $this->getBlockTypesConfig();
 
         foreach ($blockTypes as $type => $definition) {
             $this->buildingBlocks()->create([
@@ -129,6 +154,7 @@ class BmcCanvas extends Model
                 'name' => $this->name,
                 'description' => $this->description,
                 'status' => $this->status,
+                'canvas_type' => $this->canvas_type ?? 'bmc',
                 'team_id' => $this->team_id,
                 'created_at' => $this->created_at?->toISOString(),
                 'updated_at' => $this->updated_at?->toISOString(),

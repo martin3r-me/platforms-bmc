@@ -7,22 +7,24 @@ use Platform\Core\Contracts\ToolContext;
 use Platform\Core\Contracts\ToolMetadataContract;
 use Platform\Core\Contracts\ToolResult;
 use Platform\Core\Tools\Concerns\HasStandardizedWriteOperations;
+use Platform\Bmc\Models\BmcCanvas;
 use Platform\Bmc\Services\BmcCanvasService;
+use Platform\Bmc\Services\SwotMatrixService;
 use Platform\Bmc\Tools\Concerns\ResolvesBmcTeam;
 
-class CreateCanvasTool implements ToolContract, ToolMetadataContract
+class CreateSwotCanvasTool implements ToolContract, ToolMetadataContract
 {
     use HasStandardizedWriteOperations;
     use ResolvesBmcTeam;
 
     public function getName(): string
     {
-        return 'bmc.canvases.POST';
+        return 'bmc.swot.POST';
     }
 
     public function getDescription(): string
     {
-        return 'POST /bmc/canvases - Erstellt einen neuen BMC Canvas (initialisiert automatisch 9 Osterwalder Building Blocks). ERFORDERLICH: name. Optional: description, status (default: draft), contextable_type, contextable_id.';
+        return 'POST /bmc/swot - Erstellt eine neue SWOT-Analyse (4 Blocks: Strengths, Weaknesses, Opportunities, Threats). Optional mit BMC-Canvas verknuepfbar.';
     }
 
     public function getSchema(): array
@@ -35,7 +37,7 @@ class CreateCanvasTool implements ToolContract, ToolMetadataContract
                 ],
                 'name' => [
                     'type' => 'string',
-                    'description' => 'Name des Canvas (ERFORDERLICH).',
+                    'description' => 'Name der SWOT-Analyse (ERFORDERLICH).',
                 ],
                 'description' => [
                     'type' => 'string',
@@ -44,20 +46,11 @@ class CreateCanvasTool implements ToolContract, ToolMetadataContract
                 'status' => [
                     'type' => 'string',
                     'enum' => ['draft', 'active', 'archived'],
-                    'description' => 'Optional: Status (draft, active, archived). Default: draft.',
+                    'description' => 'Optional: Status. Default: draft.',
                 ],
-                'contextable_type' => [
-                    'type' => 'string',
-                    'description' => 'Optional: Polymorphic type (z.B. "Project").',
-                ],
-                'contextable_id' => [
+                'linked_bmc_canvas_id' => [
                     'type' => 'integer',
-                    'description' => 'Optional: Polymorphic ID.',
-                ],
-                'canvas_type' => [
-                    'type' => 'string',
-                    'enum' => ['bmc', 'swot'],
-                    'description' => 'Optional: Canvas-Typ (bmc oder swot). Default: bmc. BMC = 9 Osterwalder Blocks, SWOT = 4 Blocks.',
+                    'description' => 'Optional: ID eines BMC-Canvas, mit dem die SWOT-Analyse verknuepft werden soll.',
                 ],
             ],
             'required' => ['name'],
@@ -82,38 +75,44 @@ class CreateCanvasTool implements ToolContract, ToolMetadataContract
                 return ToolResult::error('VALIDATION_ERROR', 'name ist erforderlich.');
             }
 
-            $canvasType = $arguments['canvas_type'] ?? 'bmc';
-            if (!in_array($canvasType, ['bmc', 'swot'])) {
-                return ToolResult::error('VALIDATION_ERROR', 'canvas_type muss bmc oder swot sein.');
-            }
-
             $canvasService = new BmcCanvasService();
             $canvas = $canvasService->createCanvas([
                 'name' => $name,
                 'description' => $arguments['description'] ?? null,
                 'status' => $arguments['status'] ?? 'draft',
-                'canvas_type' => $canvasType,
-                'contextable_type' => $arguments['contextable_type'] ?? null,
-                'contextable_id' => $arguments['contextable_id'] ?? null,
+                'canvas_type' => 'swot',
                 'team_id' => $teamId,
                 'created_by_user_id' => $context->user->id,
             ]);
 
-            $blockCount = $canvas->buildingBlocks->count();
-            $typeLabel = $canvasType === 'swot' ? '4 SWOT' : '9 Osterwalder';
+            // Link to BMC canvas if requested
+            $linkedBmcId = $arguments['linked_bmc_canvas_id'] ?? null;
+            if ($linkedBmcId) {
+                $bmcCanvas = BmcCanvas::where('team_id', $teamId)
+                    ->where('canvas_type', 'bmc')
+                    ->find((int)$linkedBmcId);
+
+                if (!$bmcCanvas) {
+                    return ToolResult::error('NOT_FOUND', 'BMC-Canvas nicht gefunden (ID: ' . $linkedBmcId . ').');
+                }
+
+                (new SwotMatrixService())->linkToBmc($canvas, $bmcCanvas);
+                $canvas->refresh();
+            }
 
             return ToolResult::success([
                 'id' => $canvas->id,
                 'uuid' => $canvas->uuid,
                 'name' => $canvas->name,
                 'status' => $canvas->status,
-                'canvas_type' => $canvas->canvas_type,
-                'building_blocks_count' => $blockCount,
+                'canvas_type' => 'swot',
+                'building_blocks_count' => $canvas->buildingBlocks->count(),
+                'linked_bmc_canvas_id' => $canvas->contextable_id,
                 'team_id' => $canvas->team_id,
-                'message' => "Canvas erstellt mit {$typeLabel} Building Blocks.",
+                'message' => 'SWOT-Analyse erstellt mit 4 Blocks (Strengths, Weaknesses, Opportunities, Threats).',
             ]);
         } catch (\Throwable $e) {
-            return ToolResult::error('EXECUTION_ERROR', 'Fehler beim Erstellen des Canvas: ' . $e->getMessage());
+            return ToolResult::error('EXECUTION_ERROR', 'Fehler beim Erstellen der SWOT-Analyse: ' . $e->getMessage());
         }
     }
 
@@ -122,7 +121,7 @@ class CreateCanvasTool implements ToolContract, ToolMetadataContract
         return [
             'read_only' => false,
             'category' => 'action',
-            'tags' => ['bmc', 'canvases', 'create'],
+            'tags' => ['bmc', 'swot', 'create'],
             'risk_level' => 'write',
             'requires_auth' => true,
             'requires_team' => true,

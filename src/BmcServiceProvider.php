@@ -95,6 +95,11 @@ class BmcServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Bmc\Tools\GetSnapshotTool());
             $registry->register(new \Platform\Bmc\Tools\CompareSnapshotsTool());
 
+            // SWOT
+            $registry->register(new \Platform\Bmc\Tools\CreateSwotCanvasTool());
+            $registry->register(new \Platform\Bmc\Tools\ListSwotCanvasesTool());
+            $registry->register(new \Platform\Bmc\Tools\SwotMatrixTool());
+
             // Utilities
             $registry->register(new \Platform\Bmc\Tools\ExportCanvasTool());
             $registry->register(new \Platform\Bmc\Tools\CalculateTool());

@@ -52,9 +52,11 @@ class BmcBuildingBlock extends Model
 
     /**
      * Get guiding questions for this block type from config.
+     * Falls back from BMC block_types to SWOT swot_block_types.
      */
     public function getGuidingQuestions(): array
     {
-        return config("bmc-templates.block_types.{$this->block_type}.guiding_questions", []);
+        return config("bmc-templates.block_types.{$this->block_type}.guiding_questions")
+            ?? config("bmc-templates.swot_block_types.{$this->block_type}.guiding_questions", []);
     }
 }

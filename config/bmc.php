@@ -37,6 +37,11 @@ return [
                     'route' => 'bmc.canvases.index',
                     'icon' => 'heroicon-o-squares-2x2',
                 ],
+                'swot' => [
+                    'title' => 'SWOT',
+                    'route' => 'bmc.swot.index',
+                    'icon' => 'heroicon-o-arrow-path-rounded-square',
+                ],
             ],
         ],
     ],

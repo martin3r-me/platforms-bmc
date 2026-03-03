@@ -1,6 +1,6 @@
 <?php
 
-namespace Platform\Bmc\Livewire\Canvas;
+namespace Platform\Bmc\Livewire\Swot;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -35,10 +35,10 @@ class Index extends Component
         $this->dispatch('comms', [
             'model' => null,
             'modelId' => null,
-            'subject' => 'Business Model Canvas',
-            'description' => 'Canvas-Übersicht',
-            'url' => route('bmc.canvases.index'),
-            'source' => 'bmc.canvases.index',
+            'subject' => 'SWOT-Analyse',
+            'description' => 'SWOT-Uebersicht',
+            'url' => route('bmc.swot.index'),
+            'source' => 'bmc.swot.index',
             'recipients' => [],
             'meta' => ['view_type' => 'index'],
         ]);
@@ -51,7 +51,7 @@ class Index extends Component
         $teamId = $team?->id;
 
         $query = BmcCanvas::forTeam($teamId)
-            ->byCanvasType('bmc')
+            ->byCanvasType('swot')
             ->withCount('buildingBlocks')
             ->with('createdByUser');
 
@@ -66,13 +66,13 @@ class Index extends Component
         $canvases = $query->orderBy('updated_at', 'desc')->paginate(15);
 
         $stats = [
-            'total' => BmcCanvas::forTeam($teamId)->byCanvasType('bmc')->count(),
-            'draft' => BmcCanvas::forTeam($teamId)->byCanvasType('bmc')->byStatus('draft')->count(),
-            'active' => BmcCanvas::forTeam($teamId)->byCanvasType('bmc')->byStatus('active')->count(),
-            'archived' => BmcCanvas::forTeam($teamId)->byCanvasType('bmc')->byStatus('archived')->count(),
+            'total' => BmcCanvas::forTeam($teamId)->byCanvasType('swot')->count(),
+            'draft' => BmcCanvas::forTeam($teamId)->byCanvasType('swot')->byStatus('draft')->count(),
+            'active' => BmcCanvas::forTeam($teamId)->byCanvasType('swot')->byStatus('active')->count(),
+            'archived' => BmcCanvas::forTeam($teamId)->byCanvasType('swot')->byStatus('archived')->count(),
         ];
 
-        return view('bmc::livewire.canvas.index', [
+        return view('bmc::livewire.swot.index', [
             'canvases' => $canvases,
             'stats' => $stats,
         ])->layout('platform::layouts.app');

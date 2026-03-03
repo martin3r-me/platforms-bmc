@@ -94,7 +94,7 @@ class BmcCanvasService
     public function exportCanvas(BmcCanvas $canvas): array
     {
         $canvasData = $canvas->toCanvasArray();
-        $blockTypes = config('bmc-templates.block_types', []);
+        $blockTypes = $canvas->getBlockTypesConfig();
 
         $sections = [];
         foreach ($blockTypes as $type => $definition) {

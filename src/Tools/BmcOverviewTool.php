@@ -32,6 +32,7 @@ class BmcOverviewTool implements ToolContract, ToolMetadataContract
     {
         try {
             $blockTypes = config('bmc-templates.block_types', []);
+            $swotBlockTypes = config('bmc-templates.swot_block_types', []);
 
             return ToolResult::success([
                 'module' => 'bmc',
@@ -39,18 +40,30 @@ class BmcOverviewTool implements ToolContract, ToolMetadataContract
                     'team_scoped' => true,
                     'team_id_source' => 'ToolContext.team bzw. team_id Parameter',
                 ],
+                'canvas_types' => [
+                    'bmc' => [
+                        'label' => 'Business Model Canvas',
+                        'blocks_count' => 9,
+                        'note' => 'Osterwalder Business Model Canvas mit 9 Building Blocks.',
+                    ],
+                    'swot' => [
+                        'label' => 'SWOT-Analyse',
+                        'blocks_count' => 4,
+                        'note' => 'SWOT-Analyse mit 4 Quadranten: Strengths, Weaknesses, Opportunities, Threats. Kann mit BMC verknuepft werden.',
+                    ],
+                ],
                 'concepts' => [
                     'bmc_canvases' => [
                         'model' => 'Platform\\Bmc\\Models\\BmcCanvas',
                         'table' => 'bmc_canvases',
-                        'key_fields' => ['id', 'uuid', 'name', 'description', 'status', 'contextable_type', 'contextable_id', 'team_id'],
-                        'note' => 'Ein Business Model Canvas (Osterwalder). Enthaelt 9 Building Blocks. Status: draft, active, archived.',
+                        'key_fields' => ['id', 'uuid', 'name', 'description', 'status', 'canvas_type', 'contextable_type', 'contextable_id', 'team_id'],
+                        'note' => 'Ein Canvas (BMC oder SWOT). canvas_type bestimmt den Typ. BMC: 9 Blocks, SWOT: 4 Blocks. Status: draft, active, archived.',
                     ],
                     'bmc_building_blocks' => [
                         'model' => 'Platform\\Bmc\\Models\\BmcBuildingBlock',
                         'table' => 'bmc_building_blocks',
                         'key_fields' => ['id', 'uuid', 'bmc_canvas_id', 'block_type', 'label', 'position'],
-                        'note' => 'Die 9 Bausteine eines BMC. Werden automatisch beim Canvas-Erstellen angelegt.',
+                        'note' => 'Die Bausteine eines Canvas. BMC: 9, SWOT: 4. Werden automatisch beim Erstellen angelegt.',
                     ],
                     'bmc_entries' => [
                         'model' => 'Platform\\Bmc\\Models\\BmcEntry',
@@ -65,15 +78,21 @@ class BmcOverviewTool implements ToolContract, ToolMetadataContract
                         'note' => 'Versionierte Snapshots eines Canvas fuer Vergleiche.',
                     ],
                 ],
-                'block_types' => collect($blockTypes)->map(fn ($def, $type) => [
+                'bmc_block_types' => collect($blockTypes)->map(fn ($def, $type) => [
+                    'type' => $type,
+                    'label' => $def['label'],
+                    'description' => $def['description'],
+                ])->values()->toArray(),
+                'swot_block_types' => collect($swotBlockTypes)->map(fn ($def, $type) => [
                     'type' => $type,
                     'label' => $def['label'],
                     'description' => $def['description'],
                 ])->values()->toArray(),
                 'relationships' => [
-                    'canvas_has_blocks' => 'BmcCanvas -> BmcBuildingBlocks (9 Stueck, automatisch)',
+                    'canvas_has_blocks' => 'BmcCanvas -> BmcBuildingBlocks (BMC: 9, SWOT: 4, automatisch)',
                     'block_has_entries' => 'BmcBuildingBlock -> BmcEntries',
                     'canvas_has_snapshots' => 'BmcCanvas -> BmcCanvasSnapshots',
+                    'swot_linked_to_bmc' => 'SWOT Canvas -> BMC Canvas (via contextable, optional)',
                 ],
                 'related_tools' => [
                     'canvases' => [
@@ -82,6 +101,11 @@ class BmcOverviewTool implements ToolContract, ToolMetadataContract
                         'create' => 'bmc.canvases.POST',
                         'update' => 'bmc.canvases.PUT',
                         'delete' => 'bmc.canvases.DELETE',
+                    ],
+                    'swot' => [
+                        'create' => 'bmc.swot.POST',
+                        'list' => 'bmc.swot.GET',
+                        'matrix' => 'bmc.swot.matrix.GET',
                     ],
                     'entries' => [
                         'list' => 'bmc.entries.GET',

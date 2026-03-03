@@ -106,4 +106,51 @@ return [
             ],
         ],
     ],
+
+    'swot_block_types' => [
+        'strengths' => [
+            'label' => 'Strengths',
+            'description' => 'Internal attributes and resources that support a successful outcome.',
+            'position' => 1,
+            'guiding_questions' => [
+                'What do we do well?',
+                'What unique resources do we have?',
+                'What do others see as our strengths?',
+                'What competitive advantages do we have?',
+            ],
+        ],
+        'weaknesses' => [
+            'label' => 'Weaknesses',
+            'description' => 'Internal attributes and resources that work against a successful outcome.',
+            'position' => 2,
+            'guiding_questions' => [
+                'What could we improve?',
+                'Where do we have fewer resources than others?',
+                'What are others likely to see as weaknesses?',
+                'What factors lose us sales or customers?',
+            ],
+        ],
+        'opportunities' => [
+            'label' => 'Opportunities',
+            'description' => 'External factors the organization could exploit to its advantage.',
+            'position' => 3,
+            'guiding_questions' => [
+                'What opportunities are open to us?',
+                'What trends could we take advantage of?',
+                'How can we turn our strengths into opportunities?',
+                'What changes in the market could benefit us?',
+            ],
+        ],
+        'threats' => [
+            'label' => 'Threats',
+            'description' => 'External factors that could jeopardize the organization\'s success.',
+            'position' => 4,
+            'guiding_questions' => [
+                'What threats could harm us?',
+                'What is our competition doing?',
+                'What regulations or policies could affect us?',
+                'Could any of our weaknesses seriously threaten our business?',
+            ],
+        ],
+    ],
 ];

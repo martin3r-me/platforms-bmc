@@ -103,6 +103,7 @@ class UpdateCanvasTool implements ToolContract, ToolMetadataContract
                 'uuid' => $canvas->uuid,
                 'name' => $canvas->name,
                 'status' => $canvas->status,
+                'canvas_type' => $canvas->canvas_type ?? 'bmc',
                 'team_id' => $canvas->team_id,
                 'message' => 'Canvas erfolgreich aktualisiert.',
             ]);
