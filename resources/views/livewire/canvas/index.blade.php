@@ -1,7 +1,14 @@
 <x-ui-page>
     {{-- Navbar --}}
     <x-slot name="navbar">
-        <x-ui-page-navbar title="Business Model Canvas" icon="heroicon-o-squares-2x2" />
+        <x-ui-page-navbar title="" />
+    </x-slot>
+
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'BMC', 'href' => route('bmc.dashboard'), 'icon' => 'squares-2x2'],
+            ['label' => 'Canvases'],
+        ]" />
     </x-slot>
 
     {{-- Main Content --}}

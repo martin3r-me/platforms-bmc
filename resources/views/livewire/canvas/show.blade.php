@@ -1,7 +1,24 @@
 <x-ui-page>
     {{-- Navbar --}}
     <x-slot name="navbar">
-        <x-ui-page-navbar :title="$canvas->name" icon="heroicon-o-squares-2x2" />
+        <x-ui-page-navbar title="" />
+    </x-slot>
+
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'BMC', 'href' => route('bmc.dashboard'), 'icon' => 'squares-2x2'],
+            ['label' => 'Canvases', 'href' => route('bmc.canvases.index')],
+            ['label' => $canvas->name],
+        ]">
+            <x-slot name="left">
+                <a href="{{ route('bmc.canvases.pdf', $canvas) }}" target="_blank">
+                    <x-ui-button variant="ghost" size="sm">
+                        @svg('heroicon-o-arrow-down-tray', 'w-4 h-4')
+                        <span>PDF Export</span>
+                    </x-ui-button>
+                </a>
+            </x-slot>
+        </x-ui-page-actionbar>
     </x-slot>
 
     {{-- Main Content --}}
@@ -47,20 +64,6 @@
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="Canvas Info" width="w-72" :defaultOpen="true">
             <div class="p-5 space-y-5">
-                {{-- Back Button --}}
-                <a href="{{ route('bmc.canvases.index') }}" wire:navigate
-                   class="d-flex items-center gap-2 text-xs text-[var(--ui-muted)] hover:text-[var(--ui-primary)] transition-colors">
-                    @svg('heroicon-o-arrow-left', 'w-3.5 h-3.5')
-                    Zurueck zur Uebersicht
-                </a>
-
-                {{-- PDF Export --}}
-                <a href="{{ route('bmc.canvases.pdf', $canvas) }}" target="_blank"
-                   class="d-flex items-center justify-center gap-2 w-full px-3 py-2 text-xs font-semibold text-white bg-[var(--ui-primary)] hover:bg-[var(--ui-primary-hover)] rounded-md transition-colors">
-                    @svg('heroicon-o-arrow-down-tray', 'w-3.5 h-3.5')
-                    PDF Export (DIN A4)
-                </a>
-
                 {{-- Status --}}
                 <div>
                     <h3 class="text-sm font-bold text-[var(--ui-secondary)] uppercase tracking-wider mb-2">Status</h3>

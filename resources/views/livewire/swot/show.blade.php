@@ -1,7 +1,15 @@
 <x-ui-page>
     {{-- Navbar --}}
     <x-slot name="navbar">
-        <x-ui-page-navbar :title="$canvas->name" icon="heroicon-o-arrow-path-rounded-square" />
+        <x-ui-page-navbar title="" />
+    </x-slot>
+
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'BMC', 'href' => route('bmc.dashboard'), 'icon' => 'squares-2x2'],
+            ['label' => 'SWOT', 'href' => route('bmc.swot.index')],
+            ['label' => $canvas->name],
+        ]" />
     </x-slot>
 
     {{-- Main Content --}}
@@ -33,13 +41,6 @@
     <x-slot name="sidebar">
         <x-ui-page-sidebar title="SWOT Info" width="w-72" :defaultOpen="true">
             <div class="p-5 space-y-5">
-                {{-- Back Button --}}
-                <a href="{{ route('bmc.swot.index') }}" wire:navigate
-                   class="d-flex items-center gap-2 text-xs text-[var(--ui-muted)] hover:text-[var(--ui-primary)] transition-colors">
-                    @svg('heroicon-o-arrow-left', 'w-3.5 h-3.5')
-                    Zurueck zur Uebersicht
-                </a>
-
                 {{-- Linked BMC Canvas --}}
                 @if($linkedBmcCanvas)
                 <div>

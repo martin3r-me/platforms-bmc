@@ -1,7 +1,14 @@
 <x-ui-page>
     {{-- Navbar --}}
     <x-slot name="navbar">
-        <x-ui-page-navbar title="SWOT-Analyse" icon="heroicon-o-arrow-path-rounded-square" />
+        <x-ui-page-navbar title="" />
+    </x-slot>
+
+    <x-slot name="actionbar">
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'BMC', 'href' => route('bmc.dashboard'), 'icon' => 'squares-2x2'],
+            ['label' => 'SWOT'],
+        ]" />
     </x-slot>
 
     {{-- Main Content --}}
