@@ -2,6 +2,7 @@
 
 namespace Platform\Bmc;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -20,6 +21,10 @@ class BmcServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Relation::morphMap([
+            'bmc_canvas' => \Platform\Bmc\Models\BmcCanvas::class,
+        ]);
+
         // Step 1: Load config
         $this->mergeConfigFrom(__DIR__ . '/../config/bmc.php', 'bmc');
         $this->mergeConfigFrom(__DIR__ . '/../config/bmc-templates.php', 'bmc-templates');
