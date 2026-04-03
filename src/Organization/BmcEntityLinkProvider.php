@@ -15,7 +15,7 @@ class BmcEntityLinkProvider implements EntityLinkProvider
     public function linkTypeConfig(): array
     {
         return [
-            'bmc_canvas' => ['label' => 'BMC', 'icon' => 'squares-2x2', 'route' => null],
+            'bmc_canvas' => ['label' => 'BMC', 'singular' => 'BMC', 'icon' => 'squares-2x2', 'route' => null],
         ];
     }
 
@@ -43,6 +43,11 @@ class BmcEntityLinkProvider implements EntityLinkProvider
     }
 
     public function timeTrackableCascades(): array
+    {
+        return [];
+    }
+
+    public function activityChildren(string $morphAlias, array $linkableIds): array
     {
         return [];
     }
