@@ -25,6 +25,14 @@ class BmcServiceProvider extends ServiceProvider
             'bmc_canvas' => \Platform\Bmc\Models\BmcCanvas::class,
         ]);
 
+        // EntityLinkProvider registrieren (loose Kopplung mit Organization-Modul)
+        try {
+            resolve(\Platform\Organization\Services\EntityLinkRegistry::class)
+                ->register(new \Platform\Bmc\Organization\BmcEntityLinkProvider());
+        } catch (\Throwable $e) {
+            // Organization-Modul nicht geladen
+        }
+
         // Step 1: Load config
         $this->mergeConfigFrom(__DIR__ . '/../config/bmc.php', 'bmc');
         $this->mergeConfigFrom(__DIR__ . '/../config/bmc-templates.php', 'bmc-templates');
@@ -38,6 +46,7 @@ class BmcServiceProvider extends ServiceProvider
             PlatformCore::registerModule([
                 'key' => 'bmc',
                 'title' => 'BMC',
+                'group' => 'planning',
                 'routing' => config('bmc.routing'),
                 'guard' => config('bmc.guard'),
                 'navigation' => config('bmc.navigation'),
