@@ -4,7 +4,6 @@ namespace Platform\Bmc;
 
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Platform\Core\PlatformCore;
@@ -41,7 +40,7 @@ class BmcServiceProvider extends ServiceProvider
         if (
             config()->has('bmc.routing') &&
             config()->has('bmc.navigation') &&
-            Schema::hasTable('modules')
+            PlatformCore::modulesTableExists()
         ) {
             PlatformCore::registerModule([
                 'key' => 'bmc',
